@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Location Explorer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="page">
+    <h1>Location Explorer</h1>
+    <p class="subtitle">Select a location level by level.</p>
+
+    <div class="row">
+      <label for="state-select">State</label>
+      <select id="state-select">
+        <option value="">-- select a state --</option>
+        <option value="ny">New York</option>
+        <option value="vt">Vermont</option>
+        <option value="oh">Ohio</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label for="county-select">County</label>
+      <select id="county-select" disabled>
+        <option value="">-- select a county --</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label for="city-select">City / Town</label>
+      <select id="city-select" disabled>
+        <option value="">-- select a city --</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label for="village-select">Village</label>
+      <select id="village-select" disabled>
+        <option value="">-- select a village --</option>
+      </select>
+    </div>
+
+    <div class="result" id="result-box">
+      <p id="result-text"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
