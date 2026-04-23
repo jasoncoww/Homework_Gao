@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NYT Article Search - HW8</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 1rem; }
+    form { margin-bottom: 1rem; }
+    input[type="text"] { width: 60%; padding: 0.5rem; }
+    button { padding: 0.5rem 1rem; }
+    .loading { display: none; margin-left: 1rem; color: #555; }
+    .error { color: red; }
+    .results { margin-top: 1rem; }
+    .result { padding: 0.75rem; border-bottom: 1px solid #eee; }
+    .result a { font-weight: bold; color: #1a0dab; text-decoration: none; }
+    .meta { font-size: 0.9rem; color: #555; }
+    .snippet { margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>NYT Article Search (HW8)</h1>
+  <form id="searchForm">
+    <input id="query" type="text" placeholder="Search query" required />
+    <button type="submit">Search</button>
+    <span id="loading" class="loading">Loading…</span>
+  </form>
+  <div id="message" role="status"></div>
+  <div id="results" class="results"></div>
+
+  <script>
+    // Replace with your API key from https://developer.nytimes.com
+    const API_KEY = 'LFQDTDvRlyvGDkfqnQ3k6YTRUVIdoWOvuk2YIeF6crtbOK72';
+
+    const form = document.getElementById('searchForm');
+    const queryInput = document.getElementById('query');
+    const resultsEl = document.getElementById('results');
+    const loadingEl = document.getElementById('loading');
+    const messageEl = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const q = queryInput.value.trim();
+      if (!q) return;
+      resultsEl.innerHTML = '';
+      messageEl.textContent = '';
+      messageEl.className = '';
+      loadingEl.style.display = 'inline';
+      try {
+        const url = `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${encodeURIComponent(q)}&api-key=${API_KEY}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const docs = data?.response?.docs || [];
+        if (docs.length === 0) {
+          messageEl.textContent = 'No results found.';
+          return;
+        }
+        docs.forEach(doc => {
+          const div = document.createElement('div');
+          div.className = 'result';
+          const headline = doc?.headline?.main || doc?.headline || 'No title';
+          const link = doc.web_url || doc?.url || '#';
+          const pub = doc.pub_date ? (new Date(doc.pub_date)).toLocaleString() : '';
+          const snippet = doc.snippet || doc.abstract || doc.lead_paragraph || '';
+          div.innerHTML = `\n            <div><a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(headline)}</a></div>\n            <div class="meta">${escapeHtml(pub)}</div>\n            <div class="snippet">${escapeHtml(snippet)}</div>\n          `;
+          resultsEl.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        messageEl.className = 'error';
+        messageEl.textContent = 'Error fetching results. See console for details.';
+      } finally {
+        loadingEl.style.display = 'none';
+      }
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>\"']/g, function (s) {
+        return ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[s];
+      });
+    }
+  </script>
+</body>
+</html>
